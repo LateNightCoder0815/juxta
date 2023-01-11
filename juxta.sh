@@ -44,6 +44,7 @@ popd > /dev/null
 : ${TILE_SIDE:=256}
 # Hex RGB for background, when the aspect ratio for an image does not fit
 : ${BACKGROUND:=000000}
+: ${BACKGROUND_HIGHLIGHT:=1e1e1e}
 # Template for the HTML document that is generated. If multiple pages are to be generated
 # with the same look'n'feel, it might be worth it to create abd usa a custom template.
 # If the collage is unique, it is probably easier to use the default template and tweak
@@ -316,7 +317,15 @@ process_base() {
     # Cannot use GraphicsMagic here as output naming does not work like ImageMagic's
     if [[ "missing" != "$IMAGE" ]]; then
         echo "    - Creating tiles for #${IMAGE_NUMBER}/${IMAGE_COUNT} at grid ${COL}x${ROW} from $(basename "$IMAGE")"
-        convert $CONVERT_EXTRA_FIRST "$IMAGE" -auto-orient -size ${RAW_PIXEL_W}x${RAW_PIXEL_H} -strip -geometry "${GEOM_W}x${GEOM_H}${SCALE_MODIFIER}" -background "#$BACKGROUND" -gravity ${RAW_GRAVITY} -extent ${GEOM_W}x${GEOM_H} -gravity center -extent ${RAW_PIXEL_W}x${RAW_PIXEL_H} +gravity -crop ${TILE_SIDE}x${TILE_SIDE} -quality "$TILE_QUALITY" -set filename:tile "%[fx:page.x/${TILE_SIDE}+${TILE_START_COL}]_%[fx:page.y/${TILE_SIDE}+${TILE_START_ROW}]" $CONVERT_EXTRA "${DEST}/${MAX_ZOOM}/${TILE_SUB}%[filename:tile].${TILE_FORMAT}" 2> /dev/null
+        # First folder is always the year. Use alternating colors.
+        local IMAGE_YEAR=$(echo "$IMAGE" | cut -d "/" -f 2)
+        if [ $((IMAGE_YEAR%2)) -eq 0 ]
+        then
+            local IMAGE_BACKGROUND="$BACKGROUND"
+        else
+            local IMAGE_BACKGROUND="$BACKGROUND_HIGHLIGHT"
+        fi
+        convert $CONVERT_EXTRA_FIRST "$IMAGE" -auto-orient -size ${RAW_PIXEL_W}x${RAW_PIXEL_H} -strip -geometry "${GEOM_W}x${GEOM_H}${SCALE_MODIFIER}" -background "#$IMAGE_BACKGROUND" -gravity ${RAW_GRAVITY} -extent ${GEOM_W}x${GEOM_H} -gravity center -extent ${RAW_PIXEL_W}x${RAW_PIXEL_H} +gravity -crop ${TILE_SIDE}x${TILE_SIDE} -quality "$TILE_QUALITY" -set filename:tile "%[fx:page.x/${TILE_SIDE}+${TILE_START_COL}]_%[fx:page.y/${TILE_SIDE}+${TILE_START_ROW}]" $CONVERT_EXTRA "${DEST}/${MAX_ZOOM}/${TILE_SUB}%[filename:tile].${TILE_FORMAT}" 2> /dev/null
     fi
     if [[ ! -s "$DEST/${MAX_ZOOM}/${TILE_SUB}${TILE_START_COL}_${TILE_START_ROW}.${TILE_FORMAT}" ]]; then
         if [[ "missing" == "$IMAGE" ]]; then
@@ -421,6 +430,7 @@ create_zoom_levels() {
     export HALF_TILE_SIDE
     export TILE_SIDE
     export BACKGROUND
+    export BACKGROUND_HIGHLIGHT
     export VERBOSE
     ( for (( R=0 ; R<=MAX_ROW ; R++ )); do echo $R ; done ) | tr '\n' '\0' | xargs -0 -P "$THREADS" -n 1 -I {} bash -c 'process_zoom "{}"'
     echo ""
@@ -1138,6 +1148,7 @@ export RAW_GRAVITY
 export DEST
 export MAX_ZOOM
 export BACKGROUND
+export BACKGROUND_HIGHLIGHT
 export MARGIN_W
 export MARGIN_H
 export TILE_SIDE

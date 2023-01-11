@@ -50,11 +50,11 @@ function setupDemoMode(dragon, timeout = iTimeout, animateInterval = iAnimateInt
       zoomLevel = (Math.random() * 2 + 4) / 100;
     } else {
       //console.log("Zoom in");
-      zoomLevel = (Math.random() * 2 + 1) / 100;
+      zoomLevel = (Math.random() * 2 + 4) / 100;
     }
     let spot = {
-      x: (Math.random() * 80) / 100 + 0.1,
-      y: Math.random() * (ratio - zoomLevel),
+      x: (Math.random() * 25) / 100 + 0.1,
+      y: Math.random() * (ratio - zoomLevel) / 4,
       w: zoomLevel,
       h: zoomLevel
     };

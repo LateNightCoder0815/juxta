@@ -2,7 +2,7 @@
 // Must be included _after_ the dropdown selector on the web page
 
 searchConfig = {
-    defaultSearchImage: true,
+    defaultSearchImage: false,
     defaultSearchPath: false,
     defaultSearchMeta: true,
     defaultSearchMode: 'infix', // Possible values: prefix, infix
@@ -123,7 +123,7 @@ for (var i = 0 ; i < 15 ; i++) {
 function clearSearch() {
     console.log("Clearing previous search result")
     clearSVGOverlay();
-    searchMatchesElement.innerHTML = '? hits';
+    searchMatchesElement.innerHTML = '';
 }
 
 // Returns { matchCount: int, matches: [index*] }
@@ -349,7 +349,4 @@ function enableManualMark() {
     myDragon.addHandler('canvas-key', manualKey);
     overlays.dragonbox.addEventListener('contextmenu', event => event.preventDefault());
 }
-enableManualMark();
-
-
-
+//enableManualMark();

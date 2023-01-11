@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine Fotos</title>
+    <link rel="stylesheet" type="text/css" href="resources/juxta.css" />
+    <script src="resources/openseadragon.min.js"></script>
+    <script type="text/javascript" src="resources/overlays_preload.js"></script>
+    <script type="text/javascript" src="resources/overlays.js"></script>
+    <script src="resources/slideScript.js"></script>
+
+    <style>
+      html, body, .page {
+        height: 100%; /* needed for proper layout */
+      }
+      body {
+        background: #000000;
+        color: #ffffff;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+      }
+      p {
+        margin-bottom: 1em;
+      }
+      .page {
+        display: flex;
+        flex-direction: column;
+      }
+      .page-header {
+        flex: 0 0 auto;
+        background-color: #cccccc;
+        color: #000000;
+        padding: 0.5em 1em 0.5em 1em;
+      }
+      .page-content {
+        flex: 1 1 auto;
+        position: relative;/* need this to position inner content */
+        overflow-y: auto;
+      }
+      .page-footer {
+        flex: 0 0 auto;
+        background-color: #dcdcdc;
+        color: #000000;
+      }
+      #pageinfo {
+        position: absolute;
+        top: 5%;
+        left: 5%;
+        width: 90%;
+        height: 10%;
+      }
+      .page-header ul {
+        padding: 0;
+        margin: 0;
+      }
+      .page-header li {
+        display: inline;
+        list-style-type: none;
+        padding-right: 20px;
+      }
+      .page-header h1 {
+        margin-top: 0;
+        font-size: 1em;
+      }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+  <div class="page-header">
+    <div style="float: left;"><h1>Bilder: ${TOTAL_IMAGES} / MPixel: ${MEGAPIXELS} / `date +"%d.%m.%Y"`</h1></div>
+    <div style="float: right;">  <input type="text" placeholder="Search query" id="free_search" title="Type search phrase" />
+      <span id="search_matches"></span></div>
+</div>
+<div id="zoom-display" class="page-content openseadragon"><div id="header"></div><div id="infobox"></div><div id="footer"></div></div>
+
+<script type="text/javascript">
+  var myDragon = OpenSeadragon({
+    id:            "zoom-display",
+
+    maxZoomPixelRatio: ${MAX_ZOOM_PIXEL_RATIO},
+    zoomPerScroll: 2.0,    
+    showNavigator:  false,
+    wrapHorizontal: false,
+    prefixUrl: "resources/images/",
+    ${TILE_SOURCES}
+  });
+  setupDemoMode(myDragon, 60000, 5000, 5);
+  ${SETUP_OVERLAY}
+</script>
+<script type="text/javascript">
+overlays.createHeader = function(x, y, image, meta) {
+  var link = "";
+  if (image.split("/")[0] == "pictures"){
+    link = "../" + image
+  } else {
+    link = image.replace("thumbs", "pictures")
+    link = "../" + link
+    link = link.substr(0, link.length - 4)
+  }
+  return '<a href="' + link + '">' + meta.split("§")[0] + '</a>';
+}
+overlays.createFooter = function(x, y, image, meta) {
+  return meta.split("§")[1];
+}
+</script>
+
+<!-- Must be below the creation of myDragon -->
+<script type="text/javascript" src="resources/overlays.js"></script>
+
+<!-- Must be included after creation of OpenSeadragon viewer -->
+<script src="resources/search_support.js"></script>
+<script>
+    // See resources/search_support.js for all options
+    searchConfig.minQueryLength = 2;
+    searchConfig.maxMatches = 1000;
+    searchConfig.overlayOpacity = 0.8;
+    searchConfig.overlayColor = "#000000";
+    searchConfig.defaultSearchImage = false;
+</script>
+</div>
+</body>
+</html>
