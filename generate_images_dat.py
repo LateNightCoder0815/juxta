@@ -16,7 +16,7 @@ shutil.rmtree(thumbs_folder, ignore_errors=True)
 for (dirpath, dirnames, filenames) in walk(pic_folder):
     dirnames.sort()
     for file in filenames:
-        file_type = file.split(".")[1]
+        file_type = file.split(".")[-1]
         file_type = file_type.lower()
         if file_type in pic_types:
             # Write images_dat
